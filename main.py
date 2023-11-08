@@ -32,7 +32,10 @@ checkbox = tk.Checkbutton(app, text="Event",variable=event_checkbox, command=tog
 checkbox.grid(row=len(fields), columnspan=2)
 
 result_label = tk.Label(app, text="")
-result_label.grid(row=len(fields)+1, columnspan=2)
+result_label.grid(row=len(fields)+1, column=0, columnspan=1)
+
+result_label2 = tk.Label(app, text="")
+result_label2.grid(row=len(fields)+1, column=1, columnspan=2)
 
 toggle_event()
 def perform_calculation():
@@ -50,7 +53,7 @@ def perform_calculation():
                     numeric_values.append(float(value))
                 else:
                     raise ValueError
-        
+                
         simCount = 0
         upgr_cost = 0
         if event_checkbox.get():
@@ -59,6 +62,7 @@ def perform_calculation():
         else:
             updated_upchance = constants.up_chance
             
+        used_items = (0,0,0) #Wings, FMs, Gold    
         while simCount < numeric_values[6]:
             base_upgrLvl = numeric_values[0]
             while base_upgrLvl < numeric_values[1]:
@@ -75,11 +79,13 @@ def perform_calculation():
                 elif random_number < updated_upchance[base_upgrLvl] and base_upgrLvl < 2:
                     base_upgrLvl += 1
                 #Fail without scroll -> same cost as success, just dont increase upgrLvl
-                
+                used_items = (used_items[0] + constants.wings[base_upgrLvl], used_items[1] + constants.fms[base_upgrLvl],used_items[2] + constants.gold[base_upgrLvl])
             simCount += 1
         result = upgr_cost/simCount
+        used_items = (used_items[0]/simCount, used_items[1]/simCount, used_items[2]/simCount)
 
-        result_label.config(text=f"Result: {result:.2f}")
+        result_label.config(text=f"Total cost: {result:.2f}")
+        result_label2.config(text=f"Wings: {used_items[0]} FMs: {used_items[1]}" + "\n" + f"Gold: {used_items[2]}")
 
     except ValueError:
         result_label.config(text="Invalid input: Please enter valid numbers")
